@@ -1,0 +1,7 @@
+/.cache
+/.eggs
+/.idea
+/.mypy_cache
+/.tox
+/pynesis.egg-info
+**/*.pyc
