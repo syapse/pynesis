@@ -16,6 +16,11 @@ try:
 except ImportError:
     import simplejson as json
 
+try:
+    JSONDecodeError = json.JSONDecodeError
+except AttributeError:
+    JSONDecodeError = ValueError
+
 _cache = local()
 
 logger = logging.getLogger(__name__)
@@ -66,7 +71,7 @@ class KinesisRecord:
         data = {}
         try:
             data = json.loads(raw_data)
-        except json.JSONDecodeError:
+        except JSONDecodeError:
             logger.error("Cannot decode JSON payload from Kinesis Record: {}".format(raw_data))
         return data
 
