@@ -41,7 +41,7 @@ def redis_client():  # type: ()->MagicMock
     return mock
 
 
-def module_installed(module):  # type: () -> bool
+def module_installed(module):  # type: (str) -> bool
     try:
         __import__(module)
         return True

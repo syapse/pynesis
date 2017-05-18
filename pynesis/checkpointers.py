@@ -1,9 +1,10 @@
 import abc
+from typing import Optional, Dict  # noqa
 
 from six import with_metaclass
 
 
-class Checkpointer(with_metaclass(abc.ABCMeta, object)):
+class Checkpointer(with_metaclass(abc.ABCMeta, object)):  # type: ignore
     @abc.abstractmethod
     def checkpoint(self, shard_id, sequence):  # type: (str, str) -> None
         pass

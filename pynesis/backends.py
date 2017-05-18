@@ -4,17 +4,17 @@ import time
 from datetime import datetime
 from itertools import cycle
 from threading import local
-from typing import Dict, Generator, List, Optional, Tuple, Any
+from typing import Dict, Generator, List, Optional, Tuple, Any  # noqa
 
 import boto3
 from six import with_metaclass
 
-from pynesis.checkpointers import Checkpointer, InMemoryCheckpointer
+from pynesis.checkpointers import Checkpointer, InMemoryCheckpointer  # noqa
 
 try:
     import json
 except ImportError:
-    import simplejson as json
+    import simplejson as json  # type: ignore
 
 try:
     JSONDecodeError = json.JSONDecodeError
@@ -68,7 +68,7 @@ class KinesisRecord:
     @property
     def data(self):  # type: () -> Dict
         raw_data = self._raw_record.get("Data", b"")
-        data = {}
+        data = {}  # type: Dict
         try:
             data = json.loads(raw_data)
         except JSONDecodeError:
@@ -90,7 +90,7 @@ class KinesisPutRecordRequest:
         }
 
 
-class Backend(with_metaclass(abc.ABCMeta)):
+class Backend(with_metaclass(abc.ABCMeta)):  # type: ignore
     def __init__(self, *args, **kwargs):
         self._stop = False
 
