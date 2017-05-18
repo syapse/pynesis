@@ -42,10 +42,11 @@ def test_get_stream_django(mocker, settings):
     get_stream(name="stream1")
 
     assert len(kinesis_class_mock.call_args_list) == 1
+    assert len(kinesis_class_mock.call_args[1]) == 3
     checkpointer = kinesis_class_mock.call_args[1]["checkpointer"]
-    assert len(kinesis_class_mock.call_args[1]) == 2
     assert isinstance(checkpointer, checkpointers.Checkpointer)
     assert kinesis_class_mock.call_args[1]["stream_name"] == "my-stream-1"
+    assert kinesis_class_mock.call_args[1]["region_name"] == "us-east-1"
 
 
 def test_kinesis_record():
