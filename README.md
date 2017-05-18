@@ -5,6 +5,21 @@ High level kinesis client. Support python 2.7 and 3.6, and has
 helpers for using it within Django.
 
 
+Some features:
+    
+* Supports python 2 & 3
+* Django helpers included
+* Automatically detects shard count changes
+* Checkpoints/sequences persistence can be customized
+* Provided Checkpointer implementations for memory and redis
+
+Some limitations:
+
+* Single threaded/sequential. It will read from all shards in a
+round-robin fashion
+
+
+
 Usage
 -----
 
