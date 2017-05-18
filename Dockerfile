@@ -15,7 +15,7 @@ RUN getent passwd $uid || useradd -m -u $uid -g $gid pynesis
 RUN mkdir -p /code/.tox
 
 RUN chown -R $uid:$gid /usr/local /code
-RUN pip install -U pip setuptools wheel tox
+RUN pip install -U pip setuptools wheel tox mypy
 RUN pip2 install -U pip setuptools wheel tox
 
 USER $uid
