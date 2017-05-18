@@ -26,7 +26,7 @@ _cache = local()
 logger = logging.getLogger(__name__)
 
 
-class KinesisRecordsResponse(object):
+class KinesisGetRecordsResponse(object):
     def __init__(self, raw_response):  # type: (Dict) -> None
         self._raw_response = raw_response
 
@@ -39,7 +39,7 @@ class KinesisRecordsResponse(object):
         return self._raw_response.get("NextShardIterator", "")
 
 
-class KinesisStreamResponse(object):
+class KinesisDescribeStreamResponse(object):
     def __init__(self, raw_response):  # type: (Dict)->None
         self._raw_response = raw_response
 
@@ -76,7 +76,7 @@ class KinesisRecord:
         return data
 
 
-class OutgoingKinesisRecord:
+class KinesisPutRecordRequest:
     def __init__(self, stream_name, data, key):  # type: (str,str,str)->None
         self._stream_name = stream_name
         self._data = data.encode()
@@ -144,8 +144,8 @@ class KinesisBackend(Backend):
         """
         Put a record into a kinesis stream
         """
-        kinesis_record = OutgoingKinesisRecord(stream_name=self._stream_name, data=json.dumps(record),
-                                               key=key)
+        kinesis_record = KinesisPutRecordRequest(stream_name=self._stream_name, data=json.dumps(record),
+                                                 key=key)
         self._kinesis_client.put_record(**kinesis_record.build())
 
     def read(self):  # type: (...) -> Generator[Dict, None, None]
@@ -179,7 +179,7 @@ class KinesisBackend(Backend):
             Limit=self._batch_size,
         )
         records = []
-        response = KinesisRecordsResponse(raw_response)
+        response = KinesisGetRecordsResponse(raw_response)
         for record in response.records:
             records.append(record)
         return records, response.next_shard_iterator
@@ -193,7 +193,7 @@ class KinesisBackend(Backend):
         self._shards = []
         paginator = self._kinesis_client.get_paginator("describe_stream")
         for raw_response in paginator.paginate(StreamName=self._stream_name):
-            response = KinesisStreamResponse(raw_response)
+            response = KinesisDescribeStreamResponse(raw_response)
             for shard_info in response.shards:
                 self._shards.append(shard_info.id)
         self._shards_sync_time = current_time
