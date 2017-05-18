@@ -20,4 +20,3 @@ RUN pip2 install -U pip setuptools wheel tox
 
 USER $uid
 WORKDIR /code
-COPY setup.py /code
