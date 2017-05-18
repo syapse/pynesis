@@ -133,7 +133,7 @@ class KinesisBackend(Backend):
         if self._checkpointer is None:
             self._checkpointer = InMemoryCheckpointer()
 
-        self._kinesis_clien = kinesis_client
+        self._kinesis_client = kinesis_client
         if self._kinesis_client is None:
             self._kinesis_client = boto3.client("kinesis")
 
