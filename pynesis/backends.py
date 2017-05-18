@@ -117,6 +117,7 @@ class KinesisBackend(Backend):
 
     def __init__(self,
                  stream_name,  # type: str
+                 region_name,  # type: str
                  kinesis_client=None,  # type: Any
                  batch_size=10000,  # type: int
                  read_interval=1,  # type: int
@@ -135,7 +136,7 @@ class KinesisBackend(Backend):
 
         self._kinesis_client = kinesis_client
         if self._kinesis_client is None:
-            self._kinesis_client = boto3.client("kinesis")
+            self._kinesis_client = boto3.client("kinesis", region_name=region_name)
 
         self._shards = []  # type: List[str]
         self._shards_sync_time = None  # type: Optional[datetime]

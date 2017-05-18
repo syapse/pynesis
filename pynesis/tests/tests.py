@@ -15,6 +15,7 @@ def test_get_stream_django(mocker, settings):
             "CHECKPOINTER": "pynesis.checkpointers.InMemoryCheckpointer",
             "BACKEND_OPTIONS": {
                 "stream_name": "my-stream-1",
+                "region_name": "us-east-1",
             }
         },
         "stream2": {
@@ -22,6 +23,7 @@ def test_get_stream_django(mocker, settings):
             "CHECKPOINTER": "pynesis.checkpointer.InMemoryCheckpointer",
             "BACKEND_OPTIONS": {
                 "stream_name": "my-stream-2",
+                "region_name": "us-east-1",
             }
         }
     }
@@ -72,6 +74,7 @@ def test_dummy_backend(mocker):
 def test_kinesis_backend(kinesis_client):
     kinesis_backend = backends.KinesisBackend(
         stream_name="test-stream",
+        region_name="us-east-1",
         batch_size=10,
         kinesis_client=kinesis_client,
     )
@@ -99,6 +102,7 @@ def test_kinesis_backend_non_json_record(mocker, kinesis_client):
 
     kinesis_backend = backends.KinesisBackend(
         stream_name="test-stream",
+        region_name="us-east-1",
         batch_size=10,
         kinesis_client=kinesis_client)
     generator = kinesis_backend.read()
@@ -115,6 +119,7 @@ def test_kinesis_backend_resumes_sequences(kinesis_client):
 
     kinesis_backend = backends.KinesisBackend(
         stream_name="test-streams",
+        region_name="us-east-1",
         checkpointer=checkpointer_mock,
         kinesis_client=kinesis_client)
     generator = kinesis_backend.read()
