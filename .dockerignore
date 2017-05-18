@@ -1,0 +1,5 @@
+.cache
+.eggs
+.idea
+.mypy_cache
+.pynesis.egg-info

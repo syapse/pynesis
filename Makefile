@@ -33,8 +33,8 @@ build:
 	$(DOCKER) build -t $(SERVICE_NAME):latest .
 
 shell: build
-	$(DOCKER) run -v $$PWD:/code -it $(SERVICE_NAME):latest /bin/bash
+	$(DOCKER) run -v $$PWD:/code -v pynesis-tox:/code/.tox --rm -it $(SERVICE_NAME):latest /bin/bash
 
 test: build
 	# Required to clean ephemeral storage after running tests (even if they fail)
-	$(DOCKER) run -v $$PWD:/code --rm $(SERVICE_NAME):latest pytest
+	$(DOCKER) run -v $$PWD:/code -v pynesis-tox:/code/.tox --rm $(SERVICE_NAME):latest tox
