@@ -117,7 +117,7 @@ class KinesisBackend(Backend):
 
     def __init__(self,
                  stream_name,  # type: str
-                 kinesis_client,  # type: Any
+                 kinesis_client=None,  # type: Any
                  batch_size=10000,  # type: int
                  read_interval=1,  # type: int
                  shard_sync_interval=60,  # type: int
