@@ -1,7 +1,7 @@
 from mock import MagicMock, call
 
 from pynesis import checkpointers
-from pynesis.checkpointers import Checkpointer
+from pynesis.checkpointers import Checkpointer, InMemoryCheckpointer
 from pynesis.djangoutils import get_stream
 from pynesis.tests.conftest import django_only
 from .. import backends
@@ -127,3 +127,13 @@ def test_kinesis_backend_resumes_sequences(kinesis_client):
              StartingSequenceNumber="sequence3",
              StreamName="test-streams")
     ]
+
+
+def test_in_memory_checkpointer():
+    checkpointer = InMemoryCheckpointer()
+    checkpointer.checkpoint("myshard1", "sequence1")
+    checkpointer.checkpoint("myshard2", "sequence2")
+
+    assert checkpointer.get_checkpoint("myshard1") == "sequence1"
+    assert checkpointer.get_checkpoint("myshard2") == "sequence2"
+    assert checkpointer.get_all_checkpoints() == {"myshard1": "sequence1", "myshard2": "sequence2"}
