@@ -48,6 +48,7 @@ def examples(mocker, kinesis_client, redis_client):
     if module_installed("redis"):
         mocker.patch("redis.StrictRedis", return_value=redis_client)
 
+
 def module_installed(module):  # type: (str) -> bool
     try:
         __import__(module)
