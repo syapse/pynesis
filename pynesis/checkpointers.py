@@ -5,20 +5,42 @@ from six import with_metaclass
 
 
 class Checkpointer(with_metaclass(abc.ABCMeta, object)):  # type: ignore
+    """
+    Checkpointer is the interface for persisting positions for Kinesis
+    shards.
+
+    Usually you will call checkpoint("shard", "sequence") to indicate that, up
+    to that sequence (inclusive) the records from the shard for a given stream
+    has been processed.
+
+    You will need an individual Checkpointer for each stream in your application.
+    """
     @abc.abstractmethod
     def checkpoint(self, shard_id, sequence):  # type: (str, str) -> None
-        pass
+        """
+        Persist the sequence id for a given shard
+        """
 
     @abc.abstractmethod
     def get_checkpoint(self, shard_id):  # type: (str) -> Optional[str]
-        pass
+        """
+        Get the sequence id of the last succesfully processed record
+        """
 
     @abc.abstractmethod
     def get_all_checkpoints(self):  # type: () -> Dict[str,str]
-        pass
+        """
+        Get a dictionary whose keys are all the shard ids we are aware of, and whose
+        values are the sequence id of the last record processed for its shard
+        """
 
 
 class InMemoryCheckpointer(Checkpointer):
+    """
+    A purely in-memory implementation of a Checkpointer. Intended to be used
+    for development, testing, etc.
+    """
+
     def __init__(self):
         self._checkpoints = {}
 
@@ -33,6 +55,12 @@ class InMemoryCheckpointer(Checkpointer):
 
 
 class RedisCheckpointer(InMemoryCheckpointer):
+    """
+    A redis based checkpointer implementation.
+    You must have an individual Checkpointer instance for each Kinesis stream you connect to,
+    and each RedisCheckpointer instance should have an individual `key` so that shard sequences
+    are not mixed with different streams information.
+    """
     def __init__(self, redis_host="localhost",  # type: str
                  redis_port=6379,  # type: int
                  redis_db=0,  # type: int

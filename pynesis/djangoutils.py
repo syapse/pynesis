@@ -7,6 +7,13 @@ _cache = local()
 
 
 def get_stream(name):  # type: (str) -> Backend
+    """
+    This is a helper method which will return a Backend instance whose configuration
+    will be obtained from django settings module
+
+    See the project README for examples
+
+    """
     from django.conf import settings
     from django.utils.module_loading import import_string
 

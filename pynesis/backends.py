@@ -95,24 +95,28 @@ class Backend(with_metaclass(abc.ABCMeta)):  # type: ignore
         self._stop = False
 
     def stop(self):  # type: () -> None
-        """Stops the yielding of events from the read() method and makes it return"""
+        """
+        Stops the yielding of records from the read() method and makes it return
+        """
         self._stop = True
 
     @abc.abstractmethod
     def read(self):  # type: ()-> Generator[Dict, None, None]
-        """Yields events read from the eventbus"""
+        """
+        Yields records from the stream, one at a time
+        """
 
     @abc.abstractmethod
     def put(self, key, message):  # type: (str,Dict) -> None
-        """Puts a message in the eventbus"""
+        """
+        Puts a record into a kinesis stream
+        """
 
 
 class KinesisBackend(Backend):
     """
-    A kinesis based implementation of the EventBus. At this moment just
-    implementing the reading side of it
+    Kinesis stream backend
     """
-
     TYPE = "kinesis"
 
     def __init__(self,
@@ -145,9 +149,6 @@ class KinesisBackend(Backend):
         self._shards_sync_time = None  # type: Optional[datetime]
 
     def put(self, key, record):  # type: (str, Dict) -> None
-        """
-        Put a record into a kinesis stream
-        """
         kinesis_record = KinesisPutRecordRequest(stream_name=self._stream_name, data=json.dumps(record),
                                                  key=key)
         self._kinesis_client.put_record(**kinesis_record.build())
@@ -219,7 +220,9 @@ class KinesisBackend(Backend):
 
 
 class DummyBackend(Backend):
-    """A dummy Backend implementation that always yields the same dummy record"""
+    """
+    A dummy Backend implementation that always yields the same dummy record
+    """
 
     TYPE = "dummy"
     _DEFAULT_FAKE_VALUES = [{"_id": "1", "_type": "fake", "body": "Fake event from Dummy kinesis backend"}]
