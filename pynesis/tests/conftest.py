@@ -38,16 +38,16 @@ def kinesis_client():  # type: ()->MagicMock
 @pytest.fixture
 def redis_client():  # type: ()->MagicMock
     mock = CopyingMock()
-    mock.hgetall.return_value = {}
     return mock
 
 
-def django_installed():  # type: () -> bool
+def module_installed(module):  # type: () -> bool
     try:
-        import django
+        __import__(module)
         return True
     except ImportError:
         return False
 
 
-django_only = pytest.mark.skipif(not django_installed(), reason="requires django")
+django_only = pytest.mark.skipif(not module_installed("django"), reason="requires django")
+redis_only = pytest.mark.skipif(not module_installed("redis"), reason="requires redis")

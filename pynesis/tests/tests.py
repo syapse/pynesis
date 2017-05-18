@@ -1,9 +1,9 @@
 from mock import MagicMock, call
 
 from pynesis import checkpointers
-from pynesis.checkpointers import Checkpointer, InMemoryCheckpointer
+from pynesis.checkpointers import Checkpointer, InMemoryCheckpointer, RedisCheckpointer
 from pynesis.djangoutils import get_stream
-from pynesis.tests.conftest import django_only
+from pynesis.tests.conftest import django_only, redis_only
 from .. import backends
 
 
@@ -137,3 +137,19 @@ def test_in_memory_checkpointer():
     assert checkpointer.get_checkpoint("myshard1") == "sequence1"
     assert checkpointer.get_checkpoint("myshard2") == "sequence2"
     assert checkpointer.get_all_checkpoints() == {"myshard1": "sequence1", "myshard2": "sequence2"}
+
+
+@redis_only
+def test_redis_checkpointer(mocker, redis_client):
+    redis_client.hgetall.return_value = {}
+    mocker.patch("redis.StrictRedis", return_value=redis_client)
+
+    checkpointer = RedisCheckpointer()
+    checkpointer.checkpoint("myshard1", "sequence1")
+    checkpointer.checkpoint("myshard2", "sequence2")
+
+    assert checkpointer.get_checkpoint("myshard1") == "sequence1"
+    assert checkpointer.get_checkpoint("myshard2") == "sequence2"
+    assert checkpointer.get_all_checkpoints() == {"myshard1": "sequence1", "myshard2": "sequence2"}
+    assert redis_client.hset.mock_calls == [call("kinesis:sequences", "myshard1", "sequence1"),
+                                            call("kinesis:sequences", "myshard2", "sequence2")]
