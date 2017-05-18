@@ -30,7 +30,7 @@ ifndef DOCKER
 endif
 
 build:
-	$(DOCKER) build -t $(SERVICE_NAME):latest .
+	$(DOCKER) build --build-arg uid=$(UID) --build-arg gid=$(GID) -t $(SERVICE_NAME):latest .
 
 shell: build
 	$(DOCKER) run -v $$PWD:/code -v pynesis-tox:/code/.tox --rm -it $(SERVICE_NAME):latest /bin/bash
