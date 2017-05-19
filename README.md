@@ -1,4 +1,4 @@
-pynesis
+pynesis [![CircleCI](https://circleci.com/gh/ticketea/pynesis.svg?style=svg&circle-token=7c5486e8508438ca0b70ef3d795c814d71ef91f4)](https://circleci.com/gh/ticketea/pynesis)
 =======
 
 High level kinesis client. Support python 2.7 and 3.6, and has
