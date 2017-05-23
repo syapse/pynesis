@@ -6,6 +6,7 @@ install_requires = [
     "boto3>=1.4.0",
     "six>=1.9.0",
     "simplejson>=3.0.0;python_version<'3.0'",
+    "typing>=3.6.1;python_version<'3.5'",
 ]
 
 setup(
