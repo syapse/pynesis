@@ -2,7 +2,6 @@ import pytest
 from mock import MagicMock
 
 from pynesis import checkpointers, backends
-from pynesis.djangoutils import get_stream
 from pynesis.tests.conftest import django_only
 
 
@@ -22,6 +21,8 @@ def test_django_model_checkpointer():
 
 @django_only
 def test_get_stream_django(mocker, settings):
+    from pynesis.djangoutils import get_stream
+
     settings.PYNESIS_CONFIG = {
         "stream1": {
             "BACKEND": "pynesis.backends.KinesisBackend",
