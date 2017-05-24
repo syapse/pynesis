@@ -2,7 +2,6 @@ import pytest
 
 from pynesis.backends import KinesisBackend
 from pynesis.checkpointers import RedisCheckpointer
-from pynesis.djangoutils import get_stream
 from pynesis.tests.conftest import django_only, redis_only
 
 pytestmark = pytest.mark.usefixtures("examples")
@@ -78,6 +77,7 @@ def test_django_usage():
     },
 
     """
+    from pynesis.djangoutils import get_stream
 
     stream = get_stream("my-stream")
 

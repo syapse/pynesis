@@ -5,7 +5,8 @@ import sys
 import os
 
 if __name__ == "__main__":
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "tests.testapp.settings")
+    sys.path.append(os.path.join(os.path.abspath(os.path.dirname(__file__)), "pynesis/tests"))
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "testapp.settings")
 
     from django.core.management import execute_from_command_line
 

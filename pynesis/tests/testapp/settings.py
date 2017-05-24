@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "pynesis",
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -77,7 +78,10 @@ WSGI_APPLICATION = "testapp.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
+
+        # Use an in-memory database, as this is used just for testing.
+        # See https://sqlite.org/inmemorydb.html
+        "NAME": os.path.join(BASE_DIR, ":memory:"),
     }
 }
 

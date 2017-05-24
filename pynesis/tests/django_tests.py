@@ -1,12 +1,28 @@
+import pytest
 from mock import MagicMock
 
 from pynesis import checkpointers, backends
-from pynesis.djangoutils import get_stream
 from pynesis.tests.conftest import django_only
 
 
 @django_only
+@pytest.mark.django_db
+def test_django_model_checkpointer():
+    from pynesis.djangoutils import DjangoCheckpointer
+
+    checkpointer = DjangoCheckpointer(key="my-stream")
+    checkpointer.checkpoint("my-shard1", "sequence1")
+    checkpointer.checkpoint("my-shard2", "sequence2")
+
+    assert checkpointer.get_checkpoint("my-shard1") == "sequence1"
+    assert checkpointer.get_checkpoint("my-shard2") == "sequence2"
+    assert checkpointer.get_all_checkpoints() == {"my-shard1": "sequence1", "my-shard2": "sequence2"}
+
+
+@django_only
 def test_get_stream_django(mocker, settings):
+    from pynesis.djangoutils import get_stream
+
     settings.PYNESIS_CONFIG = {
         "stream1": {
             "BACKEND": "pynesis.backends.KinesisBackend",
