@@ -2,13 +2,15 @@ import pytest
 from mock import MagicMock
 
 from pynesis import checkpointers, backends
-from pynesis.djangoutils import get_stream, DjangoCheckpointer
+from pynesis.djangoutils import get_stream
 from pynesis.tests.conftest import django_only
 
 
 @django_only
 @pytest.mark.django_db
 def test_django_model_checkpointer():
+    from pynesis.djangoutils import DjangoCheckpointer
+
     checkpointer = DjangoCheckpointer(key="my-stream")
     checkpointer.checkpoint("my-shard1", "sequence1")
     checkpointer.checkpoint("my-shard2", "sequence2")
