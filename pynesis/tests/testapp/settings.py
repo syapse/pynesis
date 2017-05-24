@@ -78,6 +78,9 @@ WSGI_APPLICATION = "testapp.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
+
+        # Use an in-memory database, as this is used just for testing.
+        # See https://sqlite.org/inmemorydb.html
         "NAME": os.path.join(BASE_DIR, ":memory:"),
     }
 }
