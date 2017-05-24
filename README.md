@@ -11,7 +11,7 @@ Some features:
 * Django helpers included
 * Automatically detects shard count changes
 * Checkpoints/sequences persistence can be customized
-* Provided Checkpointer implementations for memory and redis
+* Provided Checkpointer implementations for memory, django model and redis
 * Provided Dummy kinesis implementation for development/testing
 
 Some limitations:

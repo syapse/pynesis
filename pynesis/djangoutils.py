@@ -1,9 +1,21 @@
 from threading import local
+from typing import Dict  # noqa
 
 from pynesis.backends import Backend
 from pynesis.checkpointers import Checkpointer
+from pynesis.models import Checkpoint
 
 _cache = local()
+
+try:
+    import json
+except ImportError:
+    import simplejson as json  # type: ignore
+
+try:
+    JSONDecodeError = json.JSONDecodeError
+except AttributeError:
+    JSONDecodeError = ValueError
 
 
 def get_stream(name):  # type: (str) -> Backend
@@ -32,3 +44,25 @@ def get_stream(name):  # type: (str) -> Backend
         assert isinstance(checkpointer_instance, Checkpointer)
         _cache.instance = backend_instance
     return backend_instance
+
+
+class DjangoCheckpointer(Checkpointer):
+    def __init__(self, key="checkpoint"):
+        self._key = key
+        self._checkpoints = {}
+
+    def get_all_checkpoints(self):  # type: ()->Dict[str,str]
+        if not self._checkpoints:
+            checkpoint_data = Checkpoint.objects.get_or_create(key=self._key, checkpoints="")
+            self._checkpoints = json.loads(checkpoint_data)
+        return self._checkpoints
+
+    def checkpoint(self, shard_id, sequence):  # type: (str,str) -> None
+        self._checkpoints[shard_id] = sequence
+        checkpoint_data = json.dumps(self._checkpoints)
+        Checkpoint.objects.update_or_create(key=self._key, defaults={"checkpoints": checkpoint_data})
+
+    def get_checkpoint(self, shard_id):  # type: (str)->str
+        if not self._checkpoints:
+            self.get_all_checkpoints()
+        return self._checkpoints.get(shard_id)

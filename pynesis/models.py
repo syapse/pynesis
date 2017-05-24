@@ -1,0 +1,6 @@
+from django.db import models
+
+
+class Checkpoint(models.Model):
+    key = models.CharField(max_length=256, primary_key=True)
+    checkpoints = models.TextField()
