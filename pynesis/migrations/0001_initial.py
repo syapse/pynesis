@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="Checkpoint",
             fields=[
-                ("key", models.CharField(max_length=256, primary_key=True, serialize=False)),
+                ("key", models.CharField(max_length=255, primary_key=True, serialize=False)),
                 ("checkpoints", models.TextField()),
             ],
         ),
