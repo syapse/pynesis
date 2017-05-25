@@ -54,7 +54,7 @@ class DjangoCheckpointer(Checkpointer):
     def get_all_checkpoints(self):  # type: ()->Dict[str,str]
         if not self._checkpoints:
             checkpoint_data = Checkpoint.objects.get_or_create(key=self._key, checkpoints="")
-            self._checkpoints = json.loads(checkpoint_data)
+            self._checkpoints = json.loads(checkpoint_data.checkpoints)
         return self._checkpoints
 
     def checkpoint(self, shard_id, sequence):  # type: (str,str) -> None
