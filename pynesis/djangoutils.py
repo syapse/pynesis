@@ -53,7 +53,7 @@ class DjangoCheckpointer(Checkpointer):
 
     def get_all_checkpoints(self):  # type: ()->Dict[str,str]
         if not self._checkpoints:
-            checkpoint, created = Checkpoint.objects.get_or_create(key=self._key, checkpoints="")
+            checkpoint, created = Checkpoint.objects.get_or_create(key=self._key, defaults={"checkpoints": "{}"})
             self._checkpoints = json.loads(checkpoint.checkpoints)
         return self._checkpoints
 
