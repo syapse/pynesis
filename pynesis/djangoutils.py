@@ -47,6 +47,12 @@ def get_stream(name):  # type: (str) -> Backend
 
 
 class DjangoCheckpointer(Checkpointer):
+    """
+    A Checkpointer implementation that will use a Django model where each model instance (row in the database)
+    stores all the positions for all the streams in a single stream.
+
+    The key constructor argument must be unique for each stream
+    """
     def __init__(self, key="checkpoint"):
         self._key = key
         self._checkpoints = {}
