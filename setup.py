@@ -19,7 +19,7 @@ if python_version < "3.5":
 
 setup(
     name="pynesis",
-    version="1.0",
+    version="1.1",
     url="https://github.com/ticketea/pynesis",
     description="Kinesis based python eventbus",
     long_description="Kinesis based python eventbus",
