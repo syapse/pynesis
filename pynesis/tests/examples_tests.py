@@ -61,20 +61,31 @@ def test_django_usage():
 
     Add a configuration like this to your django settings:
 
-    "api-events": {
-        "BACKEND": "pynesis.backends.KinesisBackend",
-        "BACKEND_OPTIONS": {
-            "stream_name": "api-events-staging",
-            "region_name": "eu-west-1",
-        },
-        "CHECKPOINTER": "pynesis.checkpointers.RedisCheckpointer",
-        "CHECKPOINTER_OPTIONS": {
-            "key": "kinesis:api-events",
-            "redis_host": os.environ.get("REDIS_HOST", "redis"),
-            "redis_port": os.environ.get("REDIS_PORT", 6379),
-            "redis_db": 0,
+    PYNESIS_CONFIG = {
+        "api-events": {
+            "BACKEND": "pynesis.backends.KinesisBackend",
+            "BACKEND_OPTIONS": {
+                "stream_name": "my-stream",
+                "region_name": "eu-west-1",
+            },
+            "CHECKPOINTER": "pynesis.checkpointers.RedisCheckpointer",
+            "CHECKPOINTER_OPTIONS": {
+                "key": "kinesis:my-stream",
+                "redis_host": os.environ.get("REDIS_HOST", "redis"),
+                "redis_port": os.environ.get("REDIS_PORT", 6379),
+                "redis_db": 0,
+            }
+
+           # Alternatively, you can use a database based checkpointer
+           #
+           # "CHECKPOINTER": "pynesis.djangoutils.DjangoCheckpointer",
+           # "CHECKPOINTER_OPTIONS": {
+           #     "key": "kinesis:my-stream",
+           # }
+
+
         }
-    },
+    }
 
     """
     from pynesis.djangoutils import get_stream
