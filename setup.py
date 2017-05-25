@@ -1,13 +1,21 @@
 #!/usr/bin/env python
+import platform
 
 from setuptools import setup, find_packages
+
+python_version = platform.python_version().rsplit(".", 1)[0]
+
 
 install_requires = [
     "boto3>=1.4.0",
     "six>=1.9.0",
-    "simplejson>=3.0.0;python_version<'3.0'",
-    "typing>=3.6.1;python_version<'3.5'",
 ]
+
+if python_version < "3.0":
+    install_requires.append("simplejson>=3.0.0")
+
+if python_version < "3.5":
+    install_requires.append("typing>=3.6.1")
 
 setup(
     name="pynesis",
