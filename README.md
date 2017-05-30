@@ -33,6 +33,23 @@ for record in stream.read():
     print(record)
 
 ```
+
+Now persisting the sequences:
+
+```python
+from pynesis.backends import KinesisBackend
+from pynesis.checkpointers import RedisCheckpointer
+
+checkpointer = RedisCheckpointer(redis_host="localhost")
+stream = KinesisBackend("my-stream", region_name="eu-west-2", checkpointer=checkpointer)
+
+for record in stream.read():
+    print(record)
+
+```
+
+
+
 See the examples available [here](pynesis/tests/examples_tests.py) for 
 more details
 
