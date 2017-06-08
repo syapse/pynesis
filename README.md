@@ -20,6 +20,11 @@ Some limitations:
 round-robin fashion
 
 
+Installation
+-----------
+
+Install the latest stable version from Pypi with `pip install pynesis`
+
 
 Usage
 -----
