@@ -20,6 +20,9 @@ if python_version < "3.5":
 setup(
     name="pynesis",
     version="1.1.0",
+    author="Matias Surdi",
+    author_email="matias@surdi.net",
+    keywords=["kinesis", "aws"],
     url="https://github.com/ticketea/pynesis",
     description="Kinesis based python eventbus",
     long_description="Kinesis based python eventbus",
