@@ -24,7 +24,7 @@ setup(
     author_email="matias@surdi.net",
     keywords=["kinesis", "aws"],
     url="https://github.com/ticketea/pynesis",
-    description="Kinesis based python eventbus",
+    description="Python high level client for Kinesis streams",
     long_description="Kinesis based python eventbus",
     packages=find_packages(exclude=['tests']),
     include_package_data=True,
