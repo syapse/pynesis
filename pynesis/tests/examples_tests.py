@@ -1,6 +1,6 @@
 import pytest
 
-from pynesis.streams import KinesisBackend
+from pynesis.streams import KinesisStream
 from pynesis.checkpointers import RedisCheckpointer
 from pynesis.tests.conftest import django_only, redis_only
 
@@ -13,7 +13,7 @@ def test_simple_reading_example():
     When the process is stopped/started, the polling will start from the oldest
     still available record in the stream, despite it has been already processed or not.
     """
-    stream = KinesisBackend(stream_name="my-stream", region_name="us-east-2")
+    stream = KinesisStream(stream_name="my-stream", region_name="us-east-2")
 
     for i, record in enumerate(stream.read()):
         print(record)
@@ -30,7 +30,7 @@ def test_redis_checkpointer_example():
     """
 
     redis_checkpointer = RedisCheckpointer(redis_host="localhost", key="my-stream-redis-key")
-    stream = KinesisBackend(stream_name="my-stream", region_name="us-east-2", checkpointer=redis_checkpointer)
+    stream = KinesisStream(stream_name="my-stream", region_name="us-east-2", checkpointer=redis_checkpointer)
 
     for i, record in enumerate(stream.read()):
         print(record)
@@ -45,7 +45,7 @@ def test_write_to_stream():
     the message will be sent to, and thus guarantees ordering of records
     for all records published under the same key.
     """
-    stream = KinesisBackend(stream_name="my-stream", region_name="us-east-2")
+    stream = KinesisStream(stream_name="my-stream", region_name="us-east-2")
 
     stream.put("1234", {"message": "No problemo", "from": "Alf"})
 
@@ -63,7 +63,7 @@ def test_django_usage():
 
     PYNESIS_CONFIG = {
         "api-events": {
-            "BACKEND": "pynesis.streams.KinesisBackend",
+            "BACKEND": "pynesis.streams.KinesisStream",
             "BACKEND_OPTIONS": {
                 "stream_name": "my-stream",
                 "region_name": "eu-west-1",

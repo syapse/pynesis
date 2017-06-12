@@ -13,7 +13,7 @@ def test_kinesis_record():
 
 def test_dummy_backend(mocker):
     time_mock = mocker.patch(streams.__name__ + ".time")
-    dummy_backend = streams.DummyBackend(
+    dummy_backend = streams.DummyStream(
         fake_values=[{"_key": "123", "some": "thing"}, {"_key": "2", "other": "stuff"}])
 
     generator = dummy_backend.read()
@@ -28,7 +28,7 @@ def test_dummy_backend(mocker):
 
 
 def test_kinesis_backend(kinesis_client):
-    kinesis_backend = streams.KinesisBackend(
+    kinesis_backend = streams.KinesisStream(
         stream_name="test-stream",
         region_name="us-east-1",
         batch_size=10,
@@ -56,7 +56,7 @@ def test_kinesis_backend_non_json_record(mocker, kinesis_client):
         ],
         "NextShardIterator": "iterator2"}
 
-    kinesis_backend = streams.KinesisBackend(
+    kinesis_backend = streams.KinesisStream(
         stream_name="test-stream",
         region_name="us-east-1",
         batch_size=10,
@@ -73,7 +73,7 @@ def test_kinesis_backend_resumes_sequences(kinesis_client):
 
     checkpointer_mock.get_checkpoint.side_effect = lambda x: {"shard1": "sequence3"}.get(x)
 
-    kinesis_backend = streams.KinesisBackend(
+    kinesis_backend = streams.KinesisStream(
         stream_name="test-streams",
         region_name="us-east-1",
         checkpointer=checkpointer_mock,

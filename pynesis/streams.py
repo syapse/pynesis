@@ -90,7 +90,7 @@ class KinesisPutRecordRequest:
         }
 
 
-class Backend(with_metaclass(abc.ABCMeta)):  # type: ignore
+class Stream(with_metaclass(abc.ABCMeta)):  # type: ignore
     def __init__(self, *args, **kwargs):
         self._stop = False
 
@@ -113,7 +113,7 @@ class Backend(with_metaclass(abc.ABCMeta)):  # type: ignore
         """
 
 
-class KinesisBackend(Backend):
+class KinesisStream(Stream):
     """
     Kinesis stream backend
     """
@@ -130,7 +130,7 @@ class KinesisBackend(Backend):
                  shard_sync_interval=60,  # type: int
                  checkpointer=None  # type: Checkpointer
                  ):  # type: (...) -> None
-        super(KinesisBackend, self).__init__()
+        super(KinesisStream, self).__init__()
         self._stream_name = stream_name
         self._batch_size = batch_size
         self._read_interval = read_interval
@@ -219,16 +219,16 @@ class KinesisBackend(Backend):
         return str(response.get("ShardIterator"))
 
 
-class DummyBackend(Backend):
+class DummyStream(Stream):
     """
-    A dummy Backend implementation that always yields the same dummy record
+    A dummy Stream implementation that always yields the same dummy record
     """
 
     TYPE = "dummy"
     _DEFAULT_FAKE_VALUES = [{"_id": "1", "_type": "fake", "body": "Fake event from Dummy kinesis backend"}]
 
     def __init__(self, fake_values=None, **options):  # type: (List[Dict], Any) -> None
-        super(DummyBackend, self).__init__(**options)
+        super(DummyStream, self).__init__(**options)
         if fake_values is None:
             fake_values = self._DEFAULT_FAKE_VALUES
         self._fake_values = fake_values
