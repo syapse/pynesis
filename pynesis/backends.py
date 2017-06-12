@@ -4,7 +4,7 @@ import time
 from datetime import datetime
 from itertools import cycle
 from threading import local
-from typing import Dict, Generator, List, Optional, Tuple, Any  # noqa
+from typing import Dict, Generator, List, Optional, Tuple, Iterable, Any  # noqa
 
 import boto3
 from six import with_metaclass
@@ -227,7 +227,7 @@ class DummyBackend(Backend):
     TYPE = "dummy"
     _DEFAULT_FAKE_VALUES = [{"_id": "1", "_type": "fake", "body": "Fake event from Dummy kinesis backend"}]
 
-    def __init__(self, fake_values=None, loop=False, **options):  # type: (List[Dict], Any, bool) -> None
+    def __init__(self, fake_values=None, loop=True, **options):  # type: (List[Dict], Any, bool) -> None
         super(DummyBackend, self).__init__(**options)
         if fake_values is None:
             fake_values = self._DEFAULT_FAKE_VALUES
@@ -235,10 +235,9 @@ class DummyBackend(Backend):
         self._loop = loop
 
     def read(self):  # type: ()->Generator[Dict, None, None]
+        fake_values = self._fake_values  # type: Iterable
         if self._loop:
             fake_values = cycle(self._fake_values)
-        else:
-            fake_values = self._fake_values
 
         for message in fake_values:
             yield message
