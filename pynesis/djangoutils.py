@@ -1,7 +1,7 @@
 from threading import local
 from typing import Dict  # noqa
 
-from pynesis.backends import Backend
+from pynesis.streams import Stream
 from pynesis.checkpointers import Checkpointer
 from pynesis.models import Checkpoint
 
@@ -18,9 +18,9 @@ except AttributeError:
     JSONDecodeError = ValueError
 
 
-def get_stream(name):  # type: (str) -> Backend
+def get_stream(name):  # type: (str) -> Stream
     """
-    This is a helper method which will return a Backend instance whose configuration
+    This is a helper method which will return a Stream instance whose configuration
     will be obtained from django settings module
 
     See the project README for examples
@@ -35,12 +35,12 @@ def get_stream(name):  # type: (str) -> Backend
         pynesis_config = getattr(settings, "PYNESIS_CONFIG", {}).get(name, {})
         backend_options = pynesis_config.get("BACKEND_OPTIONS", {})
         checkpointer_options = pynesis_config.get("CHECKPOINTER_OPTIONS", {})
-        backend_class = import_string(pynesis_config.get("BACKEND", "pynesis.backends.DummyBackend"))
+        backend_class = import_string(pynesis_config.get("BACKEND", "pynesis.streams.DummyStream"))
         checkpointer_class = import_string(
             pynesis_config.get("CHECKPOINTER", "pynesis.checkpointers.InMemoryCheckpointer"))
         checkpointer_instance = checkpointer_class(**checkpointer_options)
         backend_instance = backend_class(checkpointer=checkpointer_instance, **backend_options)
-        assert isinstance(backend_instance, Backend)
+        assert isinstance(backend_instance, Stream)
         assert isinstance(checkpointer_instance, Checkpointer)
         _cache.instance = backend_instance
     return backend_instance

@@ -30,9 +30,9 @@ Usage
 -----
 
 ```python
-from pynesis.backends import KinesisBackend
+from pynesis.streams import KinesisStream
 
-stream = KinesisBackend("my-stream", region_name="eu-west-2")
+stream = KinesisStream("my-stream", region_name="eu-west-2")
 
 for record in stream.read():
     print(record)
@@ -42,17 +42,16 @@ for record in stream.read():
 Now persisting the sequences:
 
 ```python
-from pynesis.backends import KinesisBackend
+from pynesis.streams import KinesisStream
 from pynesis.checkpointers import RedisCheckpointer
 
 checkpointer = RedisCheckpointer(redis_host="localhost")
-stream = KinesisBackend("my-stream", region_name="eu-west-2", checkpointer=checkpointer)
+stream = KinesisStream("my-stream", region_name="eu-west-2", checkpointer=checkpointer)
 
 for record in stream.read():
     print(record)
 
 ```
-
 
 
 See the examples available [here](pynesis/tests/examples_tests.py) for 
@@ -69,7 +68,6 @@ You can use also the provided Django model based Checkpointer if
 you want to save streams sequences into the database instead of redis, for
 using it, just add `pynesis` to `INSTALLED_APPS` and run the provided
 migration with `manage.py migrate`.
-
 
 Development environment
 =======================
