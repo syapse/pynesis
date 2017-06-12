@@ -1,7 +1,7 @@
 import pytest
 from mock import MagicMock
 
-from pynesis import checkpointers, backends
+from pynesis import checkpointers, streams
 from pynesis.tests.conftest import django_only
 
 
@@ -25,7 +25,7 @@ def test_get_stream_django(mocker, settings):
 
     settings.PYNESIS_CONFIG = {
         "stream1": {
-            "BACKEND": "pynesis.backends.KinesisBackend",
+            "BACKEND": "pynesis.streams.KinesisBackend",
             "CHECKPOINTER": "pynesis.checkpointers.InMemoryCheckpointer",
             "BACKEND_OPTIONS": {
                 "stream_name": "my-stream-1",
@@ -33,7 +33,7 @@ def test_get_stream_django(mocker, settings):
             }
         },
         "stream2": {
-            "BACKEND": "pynesis.backends.KinesisBackend",
+            "BACKEND": "pynesis.streams.KinesisBackend",
             "CHECKPOINTER": "pynesis.checkpointer.InMemoryCheckpointer",
             "BACKEND_OPTIONS": {
                 "stream_name": "my-stream-2",
@@ -42,11 +42,11 @@ def test_get_stream_django(mocker, settings):
         }
     }
     import_string_mock = mocker.patch("django.utils.module_loading.import_string")
-    kinesis_class_mock = MagicMock(return_value=MagicMock(spec=backends.Backend))  # type: ignore
+    kinesis_class_mock = MagicMock(return_value=MagicMock(spec=streams.Backend))  # type: ignore
     checkpointer_class_mock = MagicMock(return_value=MagicMock(spec=checkpointers.Checkpointer))  # type: ignore
 
     def fake_importer(class_):
-        if class_ == "pynesis.backends.KinesisBackend":
+        if class_ == "pynesis.streams.KinesisBackend":
             return kinesis_class_mock
         if class_ == "pynesis.checkpointers.InMemoryCheckpointer":
             return checkpointer_class_mock

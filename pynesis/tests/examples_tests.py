@@ -1,6 +1,6 @@
 import pytest
 
-from pynesis.backends import KinesisBackend
+from pynesis.streams import KinesisBackend
 from pynesis.checkpointers import RedisCheckpointer
 from pynesis.tests.conftest import django_only, redis_only
 
@@ -63,7 +63,7 @@ def test_django_usage():
 
     PYNESIS_CONFIG = {
         "api-events": {
-            "BACKEND": "pynesis.backends.KinesisBackend",
+            "BACKEND": "pynesis.streams.KinesisBackend",
             "BACKEND_OPTIONS": {
                 "stream_name": "my-stream",
                 "region_name": "eu-west-1",

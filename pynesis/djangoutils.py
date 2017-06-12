@@ -1,7 +1,7 @@
 from threading import local
 from typing import Dict  # noqa
 
-from pynesis.backends import Backend
+from pynesis.streams import Backend
 from pynesis.checkpointers import Checkpointer
 from pynesis.models import Checkpoint
 
@@ -35,7 +35,7 @@ def get_stream(name):  # type: (str) -> Backend
         pynesis_config = getattr(settings, "PYNESIS_CONFIG", {}).get(name, {})
         backend_options = pynesis_config.get("BACKEND_OPTIONS", {})
         checkpointer_options = pynesis_config.get("CHECKPOINTER_OPTIONS", {})
-        backend_class = import_string(pynesis_config.get("BACKEND", "pynesis.backends.DummyBackend"))
+        backend_class = import_string(pynesis_config.get("BACKEND", "pynesis.streams.DummyBackend"))
         checkpointer_class = import_string(
             pynesis_config.get("CHECKPOINTER", "pynesis.checkpointers.InMemoryCheckpointer"))
         checkpointer_instance = checkpointer_class(**checkpointer_options)

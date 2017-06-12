@@ -30,7 +30,7 @@ Usage
 -----
 
 ```python
-from pynesis.backends import KinesisBackend
+from pynesis.streams import KinesisBackend
 
 stream = KinesisBackend("my-stream", region_name="eu-west-2")
 
@@ -42,7 +42,7 @@ for record in stream.read():
 Now persisting the sequences:
 
 ```python
-from pynesis.backends import KinesisBackend
+from pynesis.streams import KinesisBackend
 from pynesis.checkpointers import RedisCheckpointer
 
 checkpointer = RedisCheckpointer(redis_host="localhost")

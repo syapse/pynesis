@@ -1,19 +1,19 @@
 from mock import MagicMock, call
 
 from pynesis.checkpointers import Checkpointer
-from .. import backends
+from .. import streams
 
 
 def test_kinesis_record():
-    record = backends.KinesisRecord({"SequenceNumber": "123", "Data": b'{"some":"json"}'})
+    record = streams.KinesisRecord({"SequenceNumber": "123", "Data": b'{"some":"json"}'})
 
     assert record.sequence == "123"
     assert record.data == {"some": "json"}
 
 
 def test_dummy_backend(mocker):
-    time_mock = mocker.patch(backends.__name__ + ".time")
-    dummy_backend = backends.DummyBackend(
+    time_mock = mocker.patch(streams.__name__ + ".time")
+    dummy_backend = streams.DummyBackend(
         fake_values=[{"_key": "123", "some": "thing"}, {"_key": "2", "other": "stuff"}])
 
     generator = dummy_backend.read()
@@ -28,7 +28,7 @@ def test_dummy_backend(mocker):
 
 
 def test_kinesis_backend(kinesis_client):
-    kinesis_backend = backends.KinesisBackend(
+    kinesis_backend = streams.KinesisBackend(
         stream_name="test-stream",
         region_name="us-east-1",
         batch_size=10,
@@ -48,7 +48,7 @@ def test_kinesis_backend(kinesis_client):
 
 
 def test_kinesis_backend_non_json_record(mocker, kinesis_client):
-    logger_mock = mocker.patch(backends.__name__ + ".logger")
+    logger_mock = mocker.patch(streams.__name__ + ".logger")
     # Setup kinesis GetRecords response
     kinesis_client.get_records.return_value = {
         "Records": [
@@ -56,7 +56,7 @@ def test_kinesis_backend_non_json_record(mocker, kinesis_client):
         ],
         "NextShardIterator": "iterator2"}
 
-    kinesis_backend = backends.KinesisBackend(
+    kinesis_backend = streams.KinesisBackend(
         stream_name="test-stream",
         region_name="us-east-1",
         batch_size=10,
@@ -73,7 +73,7 @@ def test_kinesis_backend_resumes_sequences(kinesis_client):
 
     checkpointer_mock.get_checkpoint.side_effect = lambda x: {"shard1": "sequence3"}.get(x)
 
-    kinesis_backend = backends.KinesisBackend(
+    kinesis_backend = streams.KinesisBackend(
         stream_name="test-streams",
         region_name="us-east-1",
         checkpointer=checkpointer_mock,
