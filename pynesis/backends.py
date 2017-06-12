@@ -227,7 +227,7 @@ class DummyBackend(Backend):
     TYPE = "dummy"
     _DEFAULT_FAKE_VALUES = [{"_id": "1", "_type": "fake", "body": "Fake event from Dummy kinesis backend"}]
 
-    def __init__(self, fake_values=None, loop=True, **options):  # type: (List[Dict], Any, bool) -> None
+    def __init__(self, fake_values=None, loop=True, **options):  # type: (List[Dict], bool, Any) -> None
         super(DummyBackend, self).__init__(**options)
         if fake_values is None:
             fake_values = self._DEFAULT_FAKE_VALUES
