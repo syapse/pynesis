@@ -1,3 +1,4 @@
+import pytest
 from mock import MagicMock, call
 
 from pynesis.checkpointers import Checkpointer
@@ -14,7 +15,7 @@ def test_kinesis_record():
 def test_dummy_backend(mocker):
     time_mock = mocker.patch(streams.__name__ + ".time")
     dummy_backend = streams.DummyStream(
-        fake_values=[{"_key": "123", "some": "thing"}, {"_key": "2", "other": "stuff"}])
+        fake_values=[{"_key": "123", "some": "thing"}, {"_key": "2", "other": "stuff"}], loop=True)
 
     generator = dummy_backend.read()
 
@@ -25,6 +26,20 @@ def test_dummy_backend(mocker):
     message = next(generator)
     assert message == {"_key": "123", "some": "thing"}
     assert len(time_mock.sleep.mock_calls) == 2
+
+
+def test_dummy_backend_without_loop():
+    dummy_backend = streams.DummyStream(
+        fake_values=[{"_key": "123", "some": "thing"}, {"_key": "2", "other": "stuff"}], loop=False)
+
+    generator = dummy_backend.read()
+
+    message = next(generator)
+    assert message == {"_key": "123", "some": "thing"}
+    message = next(generator)
+    assert message == {"_key": "2", "other": "stuff"}
+    with pytest.raises(StopIteration):
+        next(generator)
 
 
 def test_kinesis_backend(kinesis_client):

@@ -64,7 +64,7 @@ Django support
 If you are using django, you can configure your kinesis streams in the standard
 django `settings.py` file, see [here](pynesis/tests/examples_tests.py#L54) for an example.
 
-You can use alsto the provided Django model based Checkpointer if
+You can use also the provided Django model based Checkpointer if
 you want to save streams sequences into the database instead of redis, for
 using it, just add `pynesis` to `INSTALLED_APPS` and run the provided
 migration with `manage.py migrate`.

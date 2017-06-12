@@ -4,7 +4,7 @@ import time
 from datetime import datetime
 from itertools import cycle
 from threading import local
-from typing import Dict, Generator, List, Optional, Tuple, Any  # noqa
+from typing import Dict, Generator, List, Optional, Tuple, Iterable, Any  # noqa
 
 import boto3
 from six import with_metaclass
@@ -227,14 +227,19 @@ class DummyStream(Stream):
     TYPE = "dummy"
     _DEFAULT_FAKE_VALUES = [{"_id": "1", "_type": "fake", "body": "Fake event from Dummy kinesis backend"}]
 
-    def __init__(self, fake_values=None, **options):  # type: (List[Dict], Any) -> None
+    def __init__(self, fake_values=None, loop=True, **options):  # type: (List[Dict], bool, Any) -> None
         super(DummyStream, self).__init__(**options)
         if fake_values is None:
             fake_values = self._DEFAULT_FAKE_VALUES
         self._fake_values = fake_values
+        self._loop = loop
 
     def read(self):  # type: ()->Generator[Dict, None, None]
-        for message in cycle(self._fake_values):
+        fake_values = self._fake_values  # type: Iterable
+        if self._loop:
+            fake_values = cycle(self._fake_values)
+
+        for message in fake_values:
             yield message
             if self._stop:
                 break
