@@ -69,17 +69,6 @@ you want to save streams sequences into the database instead of redis, for
 using it, just add `pynesis` to `INSTALLED_APPS` and run the provided
 migration with `manage.py migrate`.
 
-Breaking changes from version 1.x
--------------------------------
-
-  * The package `pynesis.backends` has been renamed to `pynesis.streams`
-  * All *Backend related classes have been renamed to * stream:
-    `Backend` -> `Stream`,
-    `KinesisBackend` -> `KinesisStream`,
-    `DummyBackend` -> `DummyStream`
-
-
-
 Development environment
 =======================
 
