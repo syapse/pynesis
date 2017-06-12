@@ -27,9 +27,9 @@ def kinesis_client():  # type: ()->MagicMock
     mock.get_shard_iterator.return_value = {"ShardIterator": "iterator1"}
     mock.get_records.return_value = {
         "Records": [
-            {"Data": '{"_key":"1", "message":"message1"}', "SequenceNumber": "sequence1"},
-            {"Data": '{"_key":"2", "message":"message2"}', "SequenceNumber": "sequence2"},
-            {"Data": '{"_key":"3", "message":"message3"}', "SequenceNumber": "sequence3"},
+            {"Data": b'{"_key": "1", "message": "message1"}', "SequenceNumber": "sequence1"},
+            {"Data": b'{"_key": "2", "message": "message2"}', "SequenceNumber": "sequence2"},
+            {"Data": b'{"_key": "3", "message": "message3"}', "SequenceNumber": "sequence3"},
         ],
         "NextShardIterator": "iterator2"}
     return mock

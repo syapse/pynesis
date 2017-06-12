@@ -53,6 +53,14 @@ for record in stream.read():
 
 ```
 
+`stream.read()` returns a `KinesisRecord` on each iteration which has the following
+instance attributes for accessing the details of the raw record: 
+
+ - `sequence_number`
+ - `approximate_arrival_timestamp`
+ - `data`
+ - `partition_key`
+
 
 See the examples available [here](pynesis/tests/examples_tests.py) for 
 more details
