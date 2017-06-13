@@ -38,3 +38,7 @@ shell: build
 test: build
 	# Required to clean ephemeral storage after running tests (even if they fail)
 	$(DOCKER) run -v $$PWD:/code -v pynesis-tox:/code/.tox --rm $(SERVICE_NAME):latest tox
+
+publish: test
+	python setup.py sdist upload -r pypi
+
