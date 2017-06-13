@@ -11,16 +11,6 @@ from six import with_metaclass
 
 from pynesis.checkpointers import Checkpointer, InMemoryCheckpointer  # noqa
 
-try:
-    import json
-except ImportError:
-    import simplejson as json  # type: ignore
-
-try:
-    JSONDecodeError = json.JSONDecodeError
-except AttributeError:
-    JSONDecodeError = ValueError
-
 _cache = local()
 
 logger = logging.getLogger(__name__)
@@ -59,27 +49,29 @@ class KinesisShard(object):
 
 class KinesisRecord:
     def __init__(self, raw_record):  # type: (Dict) -> None
-        self._raw_record = raw_record or {}
+        self.sequence_number = raw_record.get("SequenceNumber")  # type: str
+        self.approximate_arrival_timestamp = raw_record.get("ApproximateArrivalTimestamp")  # type: datetime
+        self.data = raw_record.get("Data")  # type: bytes
+        self.partition_key = raw_record.get("PartitionKey")  # type: str
 
-    @property
-    def sequence(self):  # type ()-> str
-        return str(self._raw_record.get("SequenceNumber", ""))
+    @staticmethod
+    def build(sequence_number, approximate_arrival_timestamp, data,
+              partition_key):  # type: (str, datetime, bytes, str) -> KinesisRecord
+        return KinesisRecord({
+            "SequenceNumber": sequence_number,
+            "ApproximateArrivalTimestamp": approximate_arrival_timestamp,
+            "Data": data,
+            "PartitionKey": partition_key,
+        })
 
-    @property
-    def data(self):  # type: () -> Dict
-        raw_data = self._raw_record.get("Data", b"")
-        data = {}  # type: Dict
-        try:
-            data = json.loads(raw_data)
-        except JSONDecodeError:
-            logger.error("Cannot decode JSON payload from Kinesis Record: {}".format(raw_data))
-        return data
+    def __str__(self):
+        return str(self.data)
 
 
 class KinesisPutRecordRequest:
-    def __init__(self, stream_name, data, key):  # type: (str,str,str)->None
+    def __init__(self, stream_name, data, key):  # type: (str,bytes,str)->None
         self._stream_name = stream_name
-        self._data = data.encode()
+        self._data = data
         self._key = key
 
     def build(self):  # type: ()-> Dict
@@ -101,13 +93,13 @@ class Stream(with_metaclass(abc.ABCMeta)):  # type: ignore
         self._stop = True
 
     @abc.abstractmethod
-    def read(self):  # type: ()-> Generator[Dict, None, None]
+    def read(self):  # type: ()-> Generator[KinesisRecord, None, None]
         """
         Yields records from the stream, one at a time
         """
 
     @abc.abstractmethod
-    def put(self, key, message):  # type: (str,Dict) -> None
+    def put(self, key, data):  # type: (str,bytes) -> None
         """
         Puts a record into a kinesis stream
         """
@@ -148,12 +140,12 @@ class KinesisStream(Stream):
         self._shards = []  # type: List[str]
         self._shards_sync_time = None  # type: Optional[datetime]
 
-    def put(self, key, record):  # type: (str, Dict) -> None
-        kinesis_record = KinesisPutRecordRequest(stream_name=self._stream_name, data=json.dumps(record),
+    def put(self, key, data):  # type: (str, bytes) -> None
+        kinesis_record = KinesisPutRecordRequest(stream_name=self._stream_name, data=data,
                                                  key=key)
         self._kinesis_client.put_record(**kinesis_record.build())
 
-    def read(self):  # type: (...) -> Generator[Dict, None, None]
+    def read(self):  # type: (...) -> Generator[KinesisRecord, None, None]
         """
         Yields records from Kinesis one at a time.
         The process starts by loading the last processed positions by shard,
@@ -166,8 +158,8 @@ class KinesisStream(Stream):
             for shard_id, iterator in shard_iterators.items():
                 records, next_iterator = self._get_records(iterator)
                 for record in records:
-                    yield record.data
-                    self._checkpointer.checkpoint(shard_id, record.sequence)
+                    yield record
+                    self._checkpointer.checkpoint(shard_id, record.sequence_number)
                 shard_iterators[shard_id] = next_iterator
             time.sleep(self._read_interval)
 
@@ -225,25 +217,29 @@ class DummyStream(Stream):
     """
 
     TYPE = "dummy"
-    _DEFAULT_FAKE_VALUES = [{"_id": "1", "_type": "fake", "body": "Fake event from Dummy kinesis backend"}]
+    _DEFAULT_FAKE_VALUES = [b'{"_id": "1", "_type": "fake", "body": "Fake event from Dummy kinesis backend"}']
 
-    def __init__(self, fake_values=None, loop=True, **options):  # type: (List[Dict], bool, Any) -> None
+    def __init__(self, fake_values=None, loop=True, **options):  # type: (List[bytes], bool, Any) -> None
         super(DummyStream, self).__init__(**options)
         if fake_values is None:
             fake_values = self._DEFAULT_FAKE_VALUES
         self._fake_values = fake_values
         self._loop = loop
 
-    def read(self):  # type: ()->Generator[Dict, None, None]
+    def read(self):  # type: ()->Generator[KinesisRecord, None, None]
         fake_values = self._fake_values  # type: Iterable
         if self._loop:
             fake_values = cycle(self._fake_values)
 
-        for message in fake_values:
-            yield message
+        for i, message in enumerate(fake_values):
+            yield KinesisRecord.build(
+                sequence_number=str(i),
+                approximate_arrival_timestamp=datetime.now(),
+                data=message,
+                partition_key="dummy")
             if self._stop:
                 break
             time.sleep(1)
 
-    def put(self, key, message):  # type: (str,Dict) -> None
-        print("Sending outgoing message to eventbus: {}".format(json.dumps(message)))
+    def put(self, key, data):  # type: (str,bytes) -> None
+        print("Sending outgoing message to eventbus: {}".format(str(data)))
