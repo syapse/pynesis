@@ -82,3 +82,15 @@ def test_kinesis_backend_resumes_sequences(kinesis_client):
              StartingSequenceNumber="sequence3",
              StreamName="test-streams")
     ]
+
+
+def test_kinesis_backend_put(kinesis_client):
+    kinesis_backend = streams.KinesisStream(
+        stream_name="test-streams",
+        region_name="us-east-1",
+        kinesis_client=kinesis_client)
+
+    kinesis_backend.put(key="123", data=b"some bytes")
+
+    assert kinesis_client.put_record.mock_calls == [
+        call(Data=b"some bytes", PartitionKey="123", StreamName="test-streams")]
