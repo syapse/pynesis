@@ -32,8 +32,13 @@ Usage
 ```python
 from pynesis.streams import KinesisStream
 
+# Get a reference to the stream we want to work with
 stream = KinesisStream("my-stream", region_name="eu-west-2")
 
+# Write to the stream
+stream.put("key", "my message".encode("utf-8"))
+
+# Read from the stream
 for record in stream.read():
     print(record)
 

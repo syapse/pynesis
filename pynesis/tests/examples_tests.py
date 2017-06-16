@@ -1,3 +1,5 @@
+import json
+
 import pytest
 
 from pynesis.streams import KinesisStream
@@ -47,7 +49,7 @@ def test_write_to_stream():
     """
     stream = KinesisStream(stream_name="my-stream", region_name="us-east-2")
 
-    stream.put("1234", {"message": "No problemo", "from": "Alf"})
+    stream.put("1234", json.dumps({"message": "No problemo", "from": "Alf"}).encode("utf-8"))
 
 
 @django_only
@@ -92,7 +94,7 @@ def test_django_usage():
 
     stream = get_stream("my-stream")
 
-    stream.put("1234", {"message": "Hello from django"})
+    stream.put("1234", json.dumps({"message": "Hello from django"}).encode("utf-8"))
 
     for i, record in enumerate(stream.read()):
         print(record)
