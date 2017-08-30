@@ -65,14 +65,15 @@ class RedisCheckpointer(InMemoryCheckpointer):
                  redis_port=6379,  # type: int
                  redis_db=0,  # type: int
                  redis_timeout=1,  # type: int
-                 key="kinesis:sequences",  # type:str
+                 key="kinesis:sequences",  # type: str
+                 redis_password=None,  # type: Optional[str]
                  ):  # type: (...)->None
 
         from redis import StrictRedis
 
         self._redis_client = StrictRedis(host=redis_host, port=redis_port, db=redis_db,
                                          socket_timeout=redis_timeout, decode_responses=True,
-                                         socket_connect_timeout=redis_timeout)
+                                         password=redis_password, socket_connect_timeout=redis_timeout)
         self._key = key
         super(RedisCheckpointer, self).__init__()
 
