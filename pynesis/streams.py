@@ -120,7 +120,8 @@ class KinesisStream(Stream):
                  batch_size=10000,  # type: int
                  read_interval=1,  # type: int
                  shard_sync_interval=60,  # type: int
-                 checkpointer=None  # type: Checkpointer
+                 checkpointer=None,  # type: Checkpointer
+                 iterator_type="TRIM_HORIZON"  # type: str
                  ):  # type: (...) -> None
         super(KinesisStream, self).__init__()
         self._stream_name = stream_name
@@ -128,6 +129,7 @@ class KinesisStream(Stream):
         self._read_interval = read_interval
         self._shard_sync_interval = shard_sync_interval
         self._checkpointer = checkpointer  # type: Checkpointer
+        self._iterator_type = iterator_type
 
         if self._checkpointer is None:
             self._checkpointer = InMemoryCheckpointer()
@@ -202,7 +204,7 @@ class KinesisStream(Stream):
             "ShardId": shard_id,
         }
 
-        iterator_type = "TRIM_HORIZON"
+        iterator_type = self._iterator_type
         if sequence is not None:
             iterator_type = "AFTER_SEQUENCE_NUMBER"
             request["StartingSequenceNumber"] = sequence
