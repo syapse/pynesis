@@ -244,4 +244,4 @@ class DummyStream(Stream):
             time.sleep(1)
 
     def put(self, key, data):  # type: (str,bytes) -> None
-        print("Sending outgoing message to eventbus: {}".format(str(data)))
+        logger.info("Sending outgoing message to eventbus: {}".format(str(data)))
