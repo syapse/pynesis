@@ -19,7 +19,7 @@ if python_version < "3.5":
 
 setup(
     name="pynesis",
-    version="2.2.0",
+    version="2.2.1",
     author="Matias Surdi",
     author_email="matias@surdi.net",
     keywords=["kinesis", "aws"],
