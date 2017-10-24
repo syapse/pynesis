@@ -3,6 +3,8 @@ from copy import deepcopy
 import pytest
 from mock import MagicMock
 
+from botocore.exceptions import ClientError
+
 
 class CopyingMock(MagicMock):
     """
@@ -32,6 +34,19 @@ def kinesis_client():  # type: ()->MagicMock
             {"Data": b'{"_key": "3", "message": "message3"}', "SequenceNumber": "sequence3"},
         ],
         "NextShardIterator": "iterator2"}
+    return mock
+
+
+@pytest.fixture
+def failing_kinesis_client():  # type: ()->MagicMock
+    mock = MagicMock()
+    paginate_mock = MagicMock()
+    paginate_mock.side_effect = [[  # Each line is a response page
+        {"StreamDescription": {"Shards": [{"ShardId": "shard1"}]}}
+    ]]
+    mock.get_paginator.return_value.paginate = paginate_mock
+    mock.get_shard_iterator.return_value = {"ShardIterator": "iterator1"}
+    mock.get_records.side_effect = ClientError(error_response={}, operation_name="testing")
     return mock
 
 

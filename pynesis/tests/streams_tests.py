@@ -94,3 +94,17 @@ def test_kinesis_backend_put(kinesis_client):
 
     assert kinesis_client.put_record.mock_calls == [
         call(Data=b"some bytes", PartitionKey="123", StreamName="test-streams")]
+
+
+def test_kinesis_custom_exception_on_read(failing_kinesis_client):
+    kinesis_backend = streams.KinesisStream(
+        stream_name="test-stream",
+        region_name="us-east-1",
+        batch_size=10,
+        kinesis_client=failing_kinesis_client,
+    )
+
+    generator = kinesis_backend.read()
+
+    with pytest.raises(streams.StreamReadingException):
+        next(generator)

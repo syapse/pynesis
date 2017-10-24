@@ -4,16 +4,22 @@ import time
 from datetime import datetime
 from itertools import cycle
 from threading import local
+from six import with_metaclass
 from typing import Dict, Generator, List, Optional, Tuple, Iterable, Any  # noqa
 
 import boto3
-from six import with_metaclass
+from botocore.exceptions import ClientError
+from six import raise_from
 
 from pynesis.checkpointers import Checkpointer, InMemoryCheckpointer  # noqa
 
 _cache = local()
 
 logger = logging.getLogger(__name__)
+
+
+class StreamReadingException(Exception):
+    pass
 
 
 class KinesisGetRecordsResponse(object):
@@ -153,7 +159,6 @@ class KinesisStream(Stream):
         The process starts by loading the last processed positions by shard,
         then pulls a batch of events from each shard in a round-robin fashion until stop() is called
         """
-
         shard_iterators = {}  # type: Dict[str, str]
         while not self._stop:
             self._update_shard_iterators(shard_iterators)
@@ -173,10 +178,13 @@ class KinesisStream(Stream):
         return iterators
 
     def _get_records(self, iterator):  # type: (str) -> Tuple[List[KinesisRecord], str]
-        raw_response = self._kinesis_client.get_records(
-            ShardIterator=iterator,
-            Limit=self._batch_size,
-        )
+        try:
+            raw_response = self._kinesis_client.get_records(
+                ShardIterator=iterator,
+                Limit=self._batch_size,
+            )
+        except ClientError as error:
+            raise_from(StreamReadingException("Error reading from stream {}".format(str(error))), error)
         records = []
         response = KinesisGetRecordsResponse(raw_response)
         for record in response.records:
