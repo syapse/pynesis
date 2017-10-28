@@ -96,6 +96,20 @@ def test_kinesis_backend_put(kinesis_client):
         call(Data=b"some bytes", PartitionKey="123", StreamName="test-streams")]
 
 
+def test_kinesis_backend_put_batch(kinesis_client):
+    kinesis_backend = streams.KinesisStream(
+        stream_name="test-streams",
+        region_name="us-east-1",
+        kinesis_client=kinesis_client)
+
+    kinesis_backend.put_batch(records=[("key1", b"some bytes"), ("key2", b"other bytes")])
+
+    assert kinesis_client.put_records.mock_calls == [
+        call(Records=[{"Data": b"some bytes", "PartitionKey": "key1"},
+                      {"Data": b"other bytes", "PartitionKey": "key2"}],
+             StreamName="test-streams")]
+
+
 def test_kinesis_custom_exception_on_read(failing_kinesis_client):
     kinesis_backend = streams.KinesisStream(
         stream_name="test-stream",

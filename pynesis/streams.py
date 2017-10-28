@@ -88,6 +88,19 @@ class KinesisPutRecordRequest:
         }
 
 
+class KinesisBatchPutRecordRequest:
+    # type: (str,List[Tuple[bytes,str]])->None
+    def __init__(self, stream_name, records):
+        self._stream_name = stream_name
+        self._records = records
+
+    def build(self):  # type: ()-> Dict
+        return {
+            "StreamName": self._stream_name,
+            "Records": [{"Data": data, "PartitionKey": key} for key, data in self._records],
+        }
+
+
 class Stream(with_metaclass(abc.ABCMeta)):  # type: ignore
     def __init__(self, *args, **kwargs):
         self._stop = False
@@ -108,6 +121,12 @@ class Stream(with_metaclass(abc.ABCMeta)):  # type: ignore
     def put(self, key, data):  # type: (str,bytes) -> None
         """
         Puts a record into a kinesis stream
+        """
+
+    @abc.abstractmethod
+    def put_batch(self, records):  # type: (List[Tuple[str,bytes]]) -> None
+        """
+        Puts several records in one single operation
         """
 
 
@@ -149,9 +168,12 @@ class KinesisStream(Stream):
         self._shards_sync_time = None  # type: Optional[datetime]
 
     def put(self, key, data):  # type: (str, bytes) -> None
-        kinesis_record = KinesisPutRecordRequest(stream_name=self._stream_name, data=data,
-                                                 key=key)
+        kinesis_record = KinesisPutRecordRequest(stream_name=self._stream_name, data=data, key=key)
         self._kinesis_client.put_record(**kinesis_record.build())
+
+    def put_batch(self, records):  # type: (List[Tuple[str, bytes]]) -> None
+        kinesis_records = KinesisBatchPutRecordRequest(stream_name=self._stream_name, records=records)
+        self._kinesis_client.put_records(**kinesis_records.build())
 
     def read(self):  # type: (...) -> Generator[KinesisRecord, None, None]
         """
@@ -252,4 +274,7 @@ class DummyStream(Stream):
             time.sleep(1)
 
     def put(self, key, data):  # type: (str,bytes) -> None
-        logger.info("Sending outgoing message to eventbus: {}".format(str(data)))
+        logger.info("Sending outgoing message: {}".format(str(data)))
+
+    def put_batch(self, records):  # type: (List[Tuple[str,bytes]]) -> None
+        logger.info("Sending outgoing batch message: {}".format(str(records)))
