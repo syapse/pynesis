@@ -1,4 +1,4 @@
-pynesis [![CircleCI](https://circleci.com/gh/ticketea/pynesis.svg?style=svg&circle-token=7c5486e8508438ca0b70ef3d795c814d71ef91f4)](https://circleci.com/gh/ticketea/pynesis)
+pynesis [![CircleCI](https://circleci.com/gh/ticketea/pynesis.svg?style=svg&circle-token=7c5486e8508438ca0b70ef3d795c814d71ef91f4)](https://circleci.com/gh/ticketea/pynesis) [![PyPI version](https://img.shields.io/pypi/v/pynesis.svg)]() [![Python Versions](https://img.shields.io/pypi/pyversions/pynesis.svg)]()
 =======
 
 High level kinesis client. Support python 2.7 and 3.6, and has
@@ -6,7 +6,7 @@ helpers for using it within Django.
 
 
 Some features:
-    
+
 * Supports python 2 & 3
 * Django helpers included
 * Automatically detects shard count changes
@@ -59,7 +59,7 @@ for record in stream.read():
 ```
 
 `stream.read()` returns a `KinesisRecord` on each iteration which has the following
-instance attributes for accessing the details of the raw record: 
+instance attributes for accessing the details of the raw record:
 
  - `sequence_number`
  - `approximate_arrival_timestamp`
@@ -67,7 +67,7 @@ instance attributes for accessing the details of the raw record:
  - `partition_key`
 
 
-See the examples available [here](pynesis/tests/examples_tests.py) for 
+See the examples available [here](pynesis/tests/examples_tests.py) for
 more details
 
 
@@ -86,16 +86,16 @@ Development environment
 =======================
 
 Run `make shell` and then use the tests/examples.
- 
+
 
 Running tests
 =============
 
 To run all tests in all environments and python versions supported, run:
-    
+
     make test
-    
-    
+
+
 To run a single test in a single environment, from within a `make shell` run:
 
     tox -e py36-dj19-redis -- pynesis/tests/examples_tests.py::pynesis/tests/example_test.py::test_simple_reading_example
