@@ -31,4 +31,12 @@ setup(
     platforms="any",
     install_requires=install_requires,
     tests_require=["tox"],
+    classifiers=[
+        'Intended Audience :: Developers',
+        'Natural Language :: English',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3'
+    ],
 )
