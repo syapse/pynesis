@@ -1,7 +1,7 @@
 FROM python:3.6-slim
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-        python2.7 python-pip \
+        python2.7 python-pip build-essential \
         && rm -r /var/lib/apt/lists/*
 
 # Create user
