@@ -19,11 +19,11 @@ if python_version < "3.5":
 
 setup(
     name="pynesis",
-    version="2.2.1",
+    version="2.2.2",
     author="Matias Surdi",
     author_email="matias@surdi.net",
     keywords=["kinesis", "aws"],
-    url="https://github.com/ticketea/pynesis",
+    url="https://s3-us-west-1.amazonaws.com/dist.syapse.com/internal_python_packages/pynesis-2.2.2.tar.gz",
     description="Python high level client for Kinesis streams",
     long_description="Kinesis based python eventbus",
     packages=find_packages(exclude=['tests']),
