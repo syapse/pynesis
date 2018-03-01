@@ -93,3 +93,47 @@ class RedisCheckpointer(InMemoryCheckpointer):
 
     def _load_checkpoints(self):
         self._checkpoints = self._redis_client.hgetall(self._key)
+
+
+class DynamoCheckpointer(Checkpointer):
+    """
+    DynamoDB based checkpointer implementation.
+
+    Expects a Dynamo instance set up with a key of type S for the shard, where the value
+    will be the sequence number for that shard. There is no concurrency control, so only
+    one process may manipulate a given shard key at a time.
+
+    Raises botocore.errorfactory.ResourceNotFoundException if the given table does not exist.
+    """
+    def __init__(self, table_name=None,  # type: str
+                 region_name=None,  # type: str
+                 key='shard_id',  # type: str
+                 position_field='sequence_number',  # type: str
+                 endpoint=None,  # type: str
+                 ):  # type: (...)->None
+        import boto3
+
+        self._table = table_name
+        self._key = key
+        self._position_field = position_field
+        self._endpoint = endpoint
+
+        self._table = boto3.resource('dynamodb', region_name=region_name).Table(table_name)
+
+
+    def checkpoint(self, shard, position):
+        self._table.put_item(Item={self._key: shard, self._position_field: position})
+
+
+    def get_checkpoint(self, shard_id):
+        """
+        Returns the sequence number associated with the given shard. If it hasn't
+        been set yet, None is returned.
+        """
+        item = self._table.get_item(Key={self._key: shard_id}).get('Item', {})
+        return item.get(self._position_field)
+
+
+    def get_all_checkpoints(self):
+        return { i[self._key]: i[self._position_field]
+                 for i in self._table.scan()['Items'] }
