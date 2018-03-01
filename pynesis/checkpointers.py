@@ -121,11 +121,11 @@ class DynamoCheckpointer(Checkpointer):
         self._table = boto3.resource('dynamodb', region_name=region_name).Table(table_name)
 
 
-    def checkpoint(self, shard, position):
+    def checkpoint(self, shard, position):  # type: (str, str) -> None
         self._table.put_item(Item={self._key: shard, self._position_field: position})
 
 
-    def get_checkpoint(self, shard_id):
+    def get_checkpoint(self, shard_id):  # type: (str) -> Optional[str]
         """
         Returns the sequence number associated with the given shard. If it hasn't
         been set yet, None is returned.
@@ -134,6 +134,6 @@ class DynamoCheckpointer(Checkpointer):
         return item.get(self._position_field)
 
 
-    def get_all_checkpoints(self):
+    def get_all_checkpoints(self):  # type: () -> Dict[str,str]
         return { i[self._key]: i[self._position_field]
                  for i in self._table.scan()['Items'] }
