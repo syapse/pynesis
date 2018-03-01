@@ -22,7 +22,7 @@ if ! (pip list | grep awscli > /dev/null); then
     pip install awscli
 fi
 
-VERSION=2.2.2
+VERSION=2.2.3
 PACKAGE_NAME=pynesis
 
 if [ "$2" == "" ]; then
